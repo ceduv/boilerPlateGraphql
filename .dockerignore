@@ -1,0 +1,7 @@
+# Ignorer les fichiers et dossiers inutiles pour Docker
+.git
+node_modules
+vendor
+*.log
+tmp
+.air.toml

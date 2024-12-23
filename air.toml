@@ -1,0 +1,15 @@
+[build]
+cmd = "go build -o ./tmp/main ./cmd/"  # Commande pour construire l'application
+bin = "./tmp/main"               # Chemin du binaire généré par la commande de build
+include_ext = ["go", "toml"]     # Extensions de fichiers surveillées
+exclude_dir = ["vendor", "tmp"]  # Dossiers exclus de la surveillance
+exclude_file = []                # Fichiers exclus de la surveillance
+delay = 1000                     # Délai avant redémarrage (en millisecondes)
+log = "air.log"                  # Fichier de log (optionnel)
+
+[log]
+color = "true"                   # Active les couleurs dans les logs
+
+[other]
+watcher_delay = 200              # Intervalle de vérification des changements
+allow_empty_envs = true          # Autorise les environnements vides
