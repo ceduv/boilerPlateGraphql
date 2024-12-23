@@ -2,38 +2,33 @@ package main
 
 import (
 	"log"
-	"net/http"
-	"time"
-
-	"project/graph"
-
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/gorilla/websocket"
+	"os"
+	"os/signal"
+	"project/conf"
+	"project/internal/api"
+	"syscall"
 )
 
 func main() {
-	// Créez le serveur GraphQL
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	config := conf.LoadConf()
+	app := api.NewAPI(config)
 
-	// Ajoutez les transports nécessaires
-	srv.AddTransport(transport.POST{}) // Gère les requêtes HTTP POST
-	srv.AddTransport(transport.GET{})  // Gère les requêtes HTTP GET
-	srv.AddTransport(transport.Websocket{
-		Upgrader: websocket.Upgrader{
-			CheckOrigin: func(r *http.Request) bool {
-				return true // Permet toutes les origines (désactiver en production)
-			},
-		},
-		KeepAlivePingInterval: 10 * time.Second,
-	})
+	// Tester la connexion à la base de données
+	if err := app.TestDB(); err != nil {
+		log.Fatalf("Erreur de connexion à la base de données : %v", err)
+	}
 
-	// Configurez les routes HTTP
-	http.Handle("/", playground.Handler("GraphQL Playground", "/query"))
-	http.Handle("/query", srv)
+	// Lancer le serveur HTTP
+	go func() {
+		if err := app.Start(); err != nil {
+			log.Fatalf("Erreur lors du lancement du serveur : %v", err)
+		}
+	}()
 
-	// Démarrez le serveur
-	log.Println("Server is running on http://localhost:8080/")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	// Attendre les interruptions pour arrêter proprement
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	<-quit
+	app.Shutdown()
+	log.Println("Application arrêtée.")
 }

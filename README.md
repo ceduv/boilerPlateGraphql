@@ -4,10 +4,12 @@
 project/
 ├── cmd/                # Contient les points d'entrée (ex: main.go)
 │   └── main.go         # Le fichier principal de démarrage
+├── conf/               # Contient les fichiers de configuration
+│   └── conf.go         # Le fichier pour gerer la configuration
 ├── graph/              # Contient les fichiers GraphQL (ex: schema.graphql)
 │   └── model/          # Le fichier GraphQL pour les modèles
 ├── internal/           # Code spécifique à l'application (non exporté)
-│   ├── database/       # Gestion de la base de données
+│   ├── db/             # Gestion de la base de données
 │   ├── gql/            # GraphQL résolveurs et schémas
 │   ├── models/         # Structures et types de données
 │   └── utils/          # Fonctions utilitaires
